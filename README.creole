@@ -1,0 +1,27 @@
+{{{
+M""MMMMM""M oo       dP M""""""""M M""MMMMM""M 
+M  MMMM' .M          88 Mmmm  mmmM M  MMMMM  M 
+M       .MM dP .d888b88 MMMM  MMMM M  MMMMP  M 
+M  MMMb. YM 88 88'  `88 MMMM  MMMM M  MMMM' .M 
+M  MMMMb  M 88 88.  .88 MMMM  MMMM M  MMP' .MM 
+M  MMMMM  M dP `88888P8 MMMM  MMMM M     .dMMM 
+MMMMMMMMMMM             MMMMMMMMMM MMMMMMMMMMM 
+}}}                                         
+= KidTV =
+
+== Description ==
+
+//KidTV// is designed to be a simplified interface to video, providing only
+basic functionality for selecting and playing media files.  It will also have an
+alternative parental interface for more advanced control and administration.
+
+== Software ==
+
+//KidTV// should be able to be run on any Linux system, provided it has the
+prerequisites.
+
+== Controller ==
+
+Several controller designs are available.
+
+<<< vim:set ts=4 sw=4 tw=80 et cindent ai si syn=creole: >>>
