@@ -29,6 +29,7 @@
 #include "app.h"
 #include "lang.h"
 #include "git.h"
+#include "log.h"
 
 static void help_version(void);
 static void help_usage(void);
@@ -41,6 +42,8 @@ int main(int argc, char *argv[]) {
 
     // Command options
     int option_index;
+
+    log_init();
 
     while (1) {
         int mode;
@@ -71,11 +74,13 @@ int main(int argc, char *argv[]) {
         switch (mode) {
             // -V|--version
             case 'V':
+                dlog(LOG, "-V|--version\n");
                 help_version();
                 return ret;
 
             // -h|--help
             case 'h':
+                dlog(LOG, "-h|--help\n");
                 help_usage();
                 return ret;
 
@@ -106,11 +111,15 @@ int main(int argc, char *argv[]) {
 
     // Main entry point
 
+    dlog(LOG, "Starting...");
+
 quit = true;
     // Main loop
     while (!quit) {
 
     } // while (!quit)
+
+    log_end();
 
     return ret;
 }

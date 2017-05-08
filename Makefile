@@ -121,7 +121,7 @@ PROGS          = $(BINNAME)
 DIST_FILES     = $(PROGS) $(PROGS:=.asc) LICENSE README.creole Changelog
 
 # Object files to build
-OBJS           = main.o
+OBJS           = main.o log.o
 
 # Default target
 .PHONY: _PHONY
@@ -151,6 +151,14 @@ git.h: gitup git.h.TEMPLATE
 	@sed -i 's#//SOURCE//#// WARNING // Auto-generated file, DO NOT MODIFY //#' git.h
 	@sed -i 's#\%\%APP_VERSION\%\%#$(APPVER)#'                                  git.h
 	@sed -i 's#\%\%BUILD_DATE\%\%#$(BUILD_DATE)#'                               git.h
+
+log.h: log.h.TEMPLATE
+	@# Generating log header
+	@echo "Generating log header file..."
+	@cat log.h.TEMPLATE >log.h
+	@for o in $(OPTIONS:DEBUG%=LOG%); do \
+	    sed -i 's/\(#define '$${o}' *\)NULL.*$$/\1_logfile/' log.h; \
+	done
 
 
 
@@ -183,7 +191,7 @@ $(OPTIONS_FILE): $(OPTIONS_FILE).DEFAULT
 	@rm "$@" 2>/dev/null || true
 	gpg -o $@ --local-user $(GPG_KEY) --armor --detach-sign $<
 
-$(BINNAME): gitup git.h $(OBJS)
+$(BINNAME): gitup git.h log.h $(OBJS)
 	@echo "Linking $(BINNAME)..."
 	
 	$(LINK) "$(BINNAME)" $(CFLAGS) $(LIBDIR) $(OBJS) $(LIBS)
@@ -224,6 +232,9 @@ clean:
 	
 	@echo "  deleting: git.h";
 	@rm -f git.h;
+	
+	@echo "  deleting: log.h";
+	@rm -f log.h;
 	
 	@if diff $(OPTIONS_FILE).DEFAULT $(OPTIONS_FILE) >/dev/null; then \
 		echo "  deleting: $(OPTIONS_FILE)"; \
