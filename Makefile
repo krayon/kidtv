@@ -73,7 +73,7 @@ OPT_FLAGS      = -O2 -pipe -Wall -Wextra -Werror -ggdb
 LIBDIR         =
 
 # Packages we depend on (these will be pkg-config'd)
-PKGS           = 
+PKGS           = sdl
 
 LIBS           = $(shell pkg-config --libs $(PKGS))
 
@@ -121,7 +121,7 @@ PROGS          = $(BINNAME)
 DIST_FILES     = $(PROGS) $(PROGS:=.asc) LICENSE README.creole Changelog
 
 # Object files to build
-OBJS           = main.o log.o
+OBJS           = log.o main.o
 
 # Default target
 .PHONY: _PHONY

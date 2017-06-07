@@ -25,14 +25,25 @@
 #include <stdio.h>          // NULL etc
 #include <stdbool.h>        // bool etc
 #include <getopt.h>         // getopt_long() etc
+#include <unistd.h>         // sleep() etc
+
+#include <SDL/SDL.h>
 
 #include "app.h"
 #include "lang.h"
 #include "git.h"
 #include "log.h"
 
+#define WIN_WIDTH  800
+#define WIN_HEIGHT 600
+
+int win_w;
+int win_h;
+
+SDL_Surface         *winMain        = NULL;
 static void help_version(void);
 static void help_usage(void);
+static void clean_up(void);
 
 int main(int argc, char *argv[]) {
     bool quit = false;
@@ -42,6 +53,8 @@ int main(int argc, char *argv[]) {
 
     // Command options
     int option_index;
+
+    atexit(&clean_up);
 
     log_init();
 
@@ -113,13 +126,46 @@ int main(int argc, char *argv[]) {
 
     dlog(LOG, "Starting...");
 
+    if (SDL_Init(SDL_INIT_VIDEO) < 0 ) return 1;
+
+    const SDL_VideoInfo *curMode;
+    if ((curMode = SDL_GetVideoInfo()) == NULL) {
+        fprintf(stderr, "ERROR: SDL_GetVideoInfo() failed: %s", SDL_GetError());
+        return 1;
+    }
+    dlog(LOG, "Current Video Resolution: %dx%d"
+        ,curMode->current_w
+        ,curMode->current_h
+    );
+
+    win_w = curMode->current_w;
+    win_h = curMode->current_h;
+
+    win_w = WIN_WIDTH;
+    win_h = WIN_HEIGHT;
+
+    if (!(winMain = SDL_SetVideoMode(
+         win_w
+        ,win_h
+        ,0
+        ,SDL_HWSURFACE|SDL_DOUBLEBUF /* |SDL_FULLSCREEN */
+    ))) {
+        // Failed to create window
+        fprintf(stderr, "ERROR: Failed to create window\n");
+        SDL_Quit();
+        return 1;
+    }
+
+    // Set window title
+    SDL_WM_SetCaption(APP_NAME, APP_ICON_NAME);
+
+sleep(5);
 quit = true;
     // Main loop
     while (!quit) {
+//        SDL_Event event;
 
     } // while (!quit)
-
-    log_end();
 
     return ret;
 }
@@ -155,4 +201,10 @@ static void help_usage(void) {
     ,_("Displays"), APP_NAME, _("version")
     ,_("Example"),  BIN_NAME
     );
+}
+
+void clean_up(void) {
+    SDL_Quit();
+
+    log_end();
 }
