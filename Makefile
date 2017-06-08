@@ -84,28 +84,27 @@ CFLAGS        += $(CARCH_FLAG) $(CPU_FLAG) $(OPT_FLAGS) $(BUILDOPTS) $(shell pkg
 APPNAME        = $(shell sed -n 's/^[ \t]*\#define[ \t]*APP_NAME[ \t]*"\([^"]*\)".*$$/\1/p'    app.h)
 BINNAME        = $(shell sed -n 's/^[ \t]*\#define[ \t]*BIN_NAME[ \t]*"\([^"]*\)".*$$/\1/p'    app.h)
 
-# Retrieve version
+# Retrieve version from git
 #     This is something like:
-#         1.10.5-3-g6ab5527-dirty
+#         1.10.5-3-g6ab5527-dirty-ft-cool
 #     Where:
-#         1.10.5                  == tag
-#               -3                == 3 commits ahead of tag
-#                 -g6ab5527       == commit starting with g6ab5527
-#                          -dirty == some files are not in the repository
-#APPVER="$(shell grep _APP_VERSION app.h|head -1|cut -d'"' -f2)"
+#         1.10.5                          == tag
+#               -3                        == 3 commits ahead of tag
+#                 -g6ab5527               == 'g'it commit starting with 6ab5527
+#                          -dirty         == some files are not in repo
+#                                -ft-cool == ft-cool branch
 APPBRANCH = $(shell bash -c \
 	'\
-        ( \
-		  n="$$(git name-rev --always --name-only --no-undefined HEAD)"; \
-		  [ "$${n}" != "master" ] && echo -n "$${n}" || true \
-		) \
+	  n="$$(git symbolic-ref -q HEAD)"; \
+	  n="$${n\#\#refs/heads/}"; \
+	  n="$${n:-HEAD}"; \
+	  [ "$${n}" != "master" ] && echo -n "$${n}" || true \
 	')
 APPVER = $(shell bash -c \
-    '\
-        git describe          --tags --match="*" --dirty &>/dev/null \
-    &&  git describe --always --tags --match="*" --dirty             \
-    ||  (echo -n "$(APPBRANCH)-"; git describe --always --tags --dirty)     \
-    ')
+	'\
+	  echo -n "$$(git describe --always --tags --match="*" --dirty)"; \
+	  [ ! -z "$(APPBRANCH)" ] && echo -n "-$(APPBRANCH)" \
+	')
 
 BUILD_DATE     = $(shell date +'%Y-%m-%d %H:%M:%S%z')
 BUILD_MONTH    = $(shell date +'%B')
