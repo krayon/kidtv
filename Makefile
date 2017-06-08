@@ -93,17 +93,15 @@ BINNAME        = $(shell sed -n 's/^[ \t]*\#define[ \t]*BIN_NAME[ \t]*"\([^"]*\)
 #                 -g6ab5527               == 'g'it commit starting with 6ab5527
 #                          -dirty         == some files are not in repo
 #                                -ft-cool == ft-cool branch
-GITDESC = $(shell bash -c \
+APPBRANCH = $(shell bash -c \
 	'\
-	  n="$$(git symbolic-ref -q HEAD)"; \
-	  n="$${n\#\#refs/heads/}"; \
-	  n="$${n:-HEAD}"; \
+	  n="$$(git name-rev --always --name-only --no-undefined HEAD)"; \
 	  [ "$${n}" != "master" ] && echo -n "$${n}" || true \
 	')
 APPVER = $(shell bash -c \
 	'\
 	  echo -n "$$(git describe --always --tags --match="*" --dirty)"; \
-	  [ ! -z "$(GITDESC)" ] && echo -n "-$(GITDESC)" \
+	  [ ! -z "$(APPBRANCH)" ] && echo -n "-$(APPBRANCH)" \
 	')
 
 BUILD_DATE     = $(shell date +'%Y-%m-%d %H:%M:%S%z')
