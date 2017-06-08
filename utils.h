@@ -22,35 +22,25 @@
       51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **********************************************************************/
 
-#ifndef   LOG_H
-#define   LOG_H
+#ifndef   UTILS_H
+#define   UTILS_H
 
-#include <stdio.h>
+// Generic coordinates structure
+typedef struct Sipoint s_ipoint;
+struct Sipoint {
+    int x;
+    int y;
+};
 
-// IN THE EVENT 'DEBUG_INPUT' IS ENABLED IN make.options.conf, THIS:
-//     dlog(LOG_INPUT, "TURN ON\n");
-// YIELDS LOG ENTRY, SOMETHING LIKE:
-//     20140215T175217+1100 [D]           main.c:00079:main            TURN ON
+// Generic dimensions structure
+typedef struct Sidims s_idims;
+struct Sidims {
+    int w;
+    int h;
+};
 
-// Log levels, correspond to DEBUG* defines
-#define LOG                         NULL
-#define LOG_BUTTON                  NULL
+extern unsigned long get_usecs(void);
+extern unsigned long get_msecs(void);
+extern void msleep(unsigned long ms);
 
-extern FILE *_logfile;
-
-int log_init(void);
-int log_end(void);
-
-extern void std_output(FILE *strm, const char *srcfile, const int line
-    , const char *func, const char *head, const char *text, ...);
-
-#define dlog(LOGLEV, OUTPUT, args...) std_output((LOGLEV), (__FILE__)\
-    , (__LINE__), (__FUNCTION__), "[D]", (OUTPUT), ## args)
-
-#define ilog(        OUTPUT, args...) std_output(_logfile, (__FILE__)\
-    , (__LINE__), (__FUNCTION__), "[I]", (OUTPUT), ## args)
-
-#define elog(        OUTPUT, args...) std_output(_logfile, (__FILE__)\
-    , (__LINE__), (__FUNCTION__), "[E]", (OUTPUT), ## args)
-
-#endif /* LOG_H */
+#endif /* UTILS_H */

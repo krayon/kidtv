@@ -121,7 +121,7 @@ PROGS          = $(BINNAME)
 DIST_FILES     = $(PROGS) $(PROGS:=.asc) LICENSE README.creole Changelog
 
 # Object files to build
-OBJS           = log.o main.o
+OBJS           = utils.o log.o main.o
 
 # Default target
 .PHONY: _PHONY

@@ -32,18 +32,57 @@
 #include "app.h"
 #include "lang.h"
 #include "git.h"
+#include "utils.h"
 #include "log.h"
 
 #define WIN_WIDTH  800
 #define WIN_HEIGHT 600
 
-int win_w;
-int win_h;
+#define KEY_DELAY      (100)
+#define QUIT_KEY_DELAY (KEY_DELAY)
+
+// All available buttons
+typedef enum e_button t_button;
+enum e_button {
+     button_NONE      = 0
+    ,button_quit      = 1
+    ,button_left      = 2
+    ,button_right     = 3
+    ,button_playpause = 4
+    ,button_stopmenu  = 5
+};
+#define button_COUNT    6
+const char *s_button[button_COUNT] = {
+     "button_NONE"
+    ,"button_quit"
+    ,"button_left"
+    ,"button_right"
+    ,"button_playpause"
+    ,"button_stopmenu"
+};
+
+typedef struct s_buttonstate t_buttonstate;
+struct s_buttonstate {
+    // The last time the button was known to be NOT pressed
+    unsigned long last_up;
+    // The last time the button was known to be depressed
+    unsigned long last_down;
+    // Is button down now?
+    bool          down;
+    // Is this a new press (so processing can occur on button release)
+    bool          new_press;
+};
+t_buttonstate button[button_COUNT];
+
+s_idims winres;
 
 SDL_Surface         *winMain        = NULL;
 static void help_version(void);
 static void help_usage(void);
 static void clean_up(void);
+static void buttons_init(void);
+static void button_down(const t_button but, const unsigned long msecs);
+static void button_up(const t_button but, const unsigned long msecs);
 
 int main(int argc, char *argv[]) {
     bool quit = false;
@@ -138,15 +177,15 @@ int main(int argc, char *argv[]) {
         ,curMode->current_h
     );
 
-    win_w = curMode->current_w;
-    win_h = curMode->current_h;
+    winres.w = curMode->current_w;
+    winres.h = curMode->current_h;
 
-    win_w = WIN_WIDTH;
-    win_h = WIN_HEIGHT;
+    winres.w = WIN_WIDTH;
+    winres.h = WIN_HEIGHT;
 
     if (!(winMain = SDL_SetVideoMode(
-         win_w
-        ,win_h
+         winres.w
+        ,winres.h
         ,0
         ,SDL_HWSURFACE|SDL_DOUBLEBUF /* |SDL_FULLSCREEN */
     ))) {
@@ -159,13 +198,108 @@ int main(int argc, char *argv[]) {
     // Set window title
     SDL_WM_SetCaption(APP_NAME, APP_ICON_NAME);
 
-sleep(5);
-quit = true;
+    // Disable repeating keys
+    SDL_EnableKeyRepeat(0, 0);
+
+    // Initialise buttons array
+    buttons_init();
+
     // Main loop
     while (!quit) {
-//        SDL_Event event;
+        SDL_Event event;
 
+        while (!quit && SDL_PollEvent(&event)) {
+            unsigned long msecs = get_msecs();
+
+            switch (event.type) {
+                case SDL_QUIT:
+                    quit = true;
+                    break;
+
+                case SDL_KEYDOWN: {
+                    switch (event.key.keysym.sym) {
+                        case SDLK_ESCAPE:
+                            button_down(button_quit     , msecs);
+                            break;
+
+                        case SDLK_SPACE:
+                            button_down(button_playpause, msecs);
+                            break;
+
+                        case SDLK_RETURN:
+                            button_down(button_stopmenu , msecs);
+                            break;
+
+                        case SDLK_LEFT:
+                            button_down(button_left     , msecs);
+                            break;
+
+                        case SDLK_RIGHT:
+                            button_down(button_right    , msecs);
+                            break;
+
+                        // Comment out default to generate an compile error
+                        // containing a handy list of SDLK_*
+                        default:
+                            break;
+                    }
+
+                    break;
+                } // case SDL_KEYDOWN:
+
+                case SDL_KEYUP: {
+                    switch (event.key.keysym.sym) {
+                        case SDLK_ESCAPE:
+                            button_up(button_quit     , msecs);
+                            break;
+
+                        case SDLK_SPACE:
+                            button_up(button_playpause, msecs);
+                            break;
+
+                        case SDLK_RETURN:
+                            button_up(button_stopmenu , msecs);
+                            break;
+
+                        case SDLK_LEFT:
+                            button_up(button_left     , msecs);
+                            break;
+
+                        case SDLK_RIGHT:
+                            button_up(button_right    , msecs);
+                            break;
+
+                        // Comment out default to generate an compile error
+                        // containing a handy list of SDLK_*
+                        default:
+                            break;
+                    }
+
+                    break;
+                } // case SDL_KEYUP:
+            } // switch (event.type)
+        } // while (SDL_PollEvent(&event))
+
+        // Quit button has been released
+        if (button[button_quit].new_press && !button[button_quit].down) {
+            if (button[button_quit].last_up != 0) {
+                dlog(LOG_BUTTON
+                    ,"!escape: %ld (last_down), %ld (last_up), %ld (a-b)\n"
+                    ,button[button_quit].last_down
+                    ,button[button_quit].last_up
+                    ,button[button_quit].last_down - button[button_quit].last_up
+                );
+
+                if (button[button_quit].last_down - button[button_quit].last_up > QUIT_KEY_DELAY) {
+                    quit = true;
+                }
+            }
+
+            button[button_quit].new_press = false;
+        } // if (!button[button_quit].down)
     } // while (!quit)
+
+    // NOTE: cleanup() is called here (via atexit())
 
     return ret;
 }
@@ -203,8 +337,37 @@ static void help_usage(void) {
     );
 }
 
-void clean_up(void) {
+static void clean_up(void) {
     SDL_Quit();
 
     log_end();
 }
+
+static void buttons_init(void) {
+    t_button i;
+
+    for (i = 0; i < button_COUNT; ++i) {
+        button[i].new_press = false;
+        button[i].down      = false;
+        button[i].last_up   = 0;
+        button[i].last_down = 0;
+    }
+}
+
+static void button_down(const t_button but, const unsigned long msecs) {
+    if (!button[but].down) {
+        dlog(LOG_BUTTON, "DOWN: %s\n", s_button[but]);
+
+        button[but].down      = true;
+        button[but].new_press = true;
+        button[but].last_up   = msecs;
+    }
+}
+
+static void button_up(const t_button but, const unsigned long msecs) {
+    dlog(LOG_BUTTON, "UP:   %s\n", s_button[but]);
+
+    button[but].down      = false;
+    button[but].last_down = msecs;
+}
+

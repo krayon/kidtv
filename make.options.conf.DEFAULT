@@ -23,3 +23,4 @@
 # **********************************************************************/
 
 #OPTIONS += DEBUG					# General debugging
+#OPTIONS += DEBUG_BUTTON			# Button/Key assignment and state
