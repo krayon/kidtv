@@ -93,7 +93,7 @@ BINNAME        = $(shell sed -n 's/^[ \t]*\#define[ \t]*BIN_NAME[ \t]*"\([^"]*\)
 #                 -g6ab5527               == 'g'it commit starting with 6ab5527
 #                          -dirty         == some files are not in repo
 #                                -ft-cool == ft-cool branch
-APPBRANCH = $(shell bash -c \
+GITDESC = $(shell bash -c \
 	'\
 	  n="$$(git symbolic-ref -q HEAD)"; \
 	  n="$${n\#\#refs/heads/}"; \
@@ -103,12 +103,13 @@ APPBRANCH = $(shell bash -c \
 APPVER = $(shell bash -c \
 	'\
 	  echo -n "$$(git describe --always --tags --match="*" --dirty)"; \
-	  [ ! -z "$(APPBRANCH)" ] && echo -n "-$(APPBRANCH)" \
+	  [ ! -z "$(GITDESC)" ] && echo -n "-$(GITDESC)" \
 	')
 
 BUILD_DATE     = $(shell date +'%Y-%m-%d %H:%M:%S%z')
 BUILD_MONTH    = $(shell date +'%B')
 BUILD_YEAR     = $(shell date +'%Y')
+BUILD_COMMIT   = $(shell git rev-parse --verify 'HEAD^{commit}')
 
 ARCHIVE_NAME   = $(BINNAME)-$(APPVER)
 ARCHIVE_FILE   = $(ARCHIVE_NAME).$(ARCHIVE_EXT)
@@ -150,6 +151,7 @@ git.h: gitup git.h.TEMPLATE
 	@sed -i 's#//SOURCE//#// WARNING // Auto-generated file, DO NOT MODIFY //#' git.h
 	@sed -i 's#\%\%APP_VERSION\%\%#$(APPVER)#'                                  git.h
 	@sed -i 's#\%\%BUILD_DATE\%\%#$(BUILD_DATE)#'                               git.h
+	@sed -i 's#\%\%BUILD_COMMIT\%\%#$(BUILD_COMMIT)#'                           git.h
 
 log.h: log.h.TEMPLATE
 	@# Generating log header

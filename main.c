@@ -305,7 +305,11 @@ int main(int argc, char *argv[]) {
 }
 
 static void help_version(void) {
-    printf("%s v%s (BUILT: %s)\n", (APP_NAME), (APP_VERSION), (BUILD_DATE));
+    printf("%s v%s\n(BUILT: %s)\n"
+        ,(APP_NAME)
+        ,(APP_VERSION)
+        ,(BUILD_DATE)
+    );
     printf("%s\n", (APP_COPYRIGHT));
     printf("%s\n", (APP_SUMMARY));
     printf("%s\n", (APP_URL));
