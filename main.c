@@ -38,7 +38,7 @@
 #define WIN_WIDTH  800
 #define WIN_HEIGHT 600
 
-#define BUTTON_DELAY      (100)
+#define BUTTON_DELAY      (2000)
 #define QUIT_BUTTON_DELAY (BUTTON_DELAY)
 
 // All available buttons
@@ -284,7 +284,7 @@ int main(int argc, char *argv[]) {
         if (button[button_quit].new_press && !button[button_quit].down) {
             if (button[button_quit].last_up != 0) {
                 dlog(LOG_BUTTON
-                    ,"!escape: %ld (last_down), %ld (last_up), %ld (a-b)\n"
+                    ,"!quit: %ld (last_down), %ld (last_up), %ld (a-b)\n"
                     ,button[button_quit].last_down
                     ,button[button_quit].last_up
                     ,button[button_quit].last_down - button[button_quit].last_up
