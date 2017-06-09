@@ -29,4 +29,8 @@ Several controller designs are available.
 * v0.0.0
 ** Creates a window you can quit from :D
 
+== Bugs ==
+
+# SDL is returning key up/down events even when key is held down.
+
 <<< vim:set ts=4 sw=4 tw=80 et cindent ai si syn=creole: >>>
