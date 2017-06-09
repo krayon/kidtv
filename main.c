@@ -208,77 +208,37 @@ int main(int argc, char *argv[]) {
     while (!quit) {
         SDL_Event event;
 
-        while (!quit && SDL_PollEvent(&event)) {
-            unsigned long msecs = get_msecs();
+        unsigned long msecs = 0;
 
+        Uint8 *key_state = NULL;
+
+        while (!quit && SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_QUIT:
                     quit = true;
                     break;
-
-                case SDL_KEYDOWN: {
-                    switch (event.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                            button_down(button_quit     , msecs);
-                            break;
-
-                        case SDLK_SPACE:
-                            button_down(button_playpause, msecs);
-                            break;
-
-                        case SDLK_RETURN:
-                            button_down(button_stopmenu , msecs);
-                            break;
-
-                        case SDLK_LEFT:
-                            button_down(button_left     , msecs);
-                            break;
-
-                        case SDLK_RIGHT:
-                            button_down(button_right    , msecs);
-                            break;
-
-                        // Comment out default to generate an compile error
-                        // containing a handy list of SDLK_*
-                        default:
-                            break;
-                    }
-
-                    break;
-                } // case SDL_KEYDOWN:
-
-                case SDL_KEYUP: {
-                    switch (event.key.keysym.sym) {
-                        case SDLK_ESCAPE:
-                            button_up(button_quit     , msecs);
-                            break;
-
-                        case SDLK_SPACE:
-                            button_up(button_playpause, msecs);
-                            break;
-
-                        case SDLK_RETURN:
-                            button_up(button_stopmenu , msecs);
-                            break;
-
-                        case SDLK_LEFT:
-                            button_up(button_left     , msecs);
-                            break;
-
-                        case SDLK_RIGHT:
-                            button_up(button_right    , msecs);
-                            break;
-
-                        // Comment out default to generate an compile error
-                        // containing a handy list of SDLK_*
-                        default:
-                            break;
-                    }
-
-                    break;
-                } // case SDL_KEYUP:
             } // switch (event.type)
         } // while (SDL_PollEvent(&event))
+
+        // Get current milliseconds
+        msecs = get_msecs();
+
+        // Get current key state
+        key_state = SDL_GetKeyState(NULL);
+
+        // SDL_KEYDOWN handling (that works)
+        if ( key_state[SDLK_ESCAPE]) button_down(button_quit     , msecs);
+        if ( key_state[SDLK_SPACE])  button_down(button_playpause, msecs);
+        if ( key_state[SDLK_RETURN]) button_down(button_stopmenu , msecs);
+        if ( key_state[SDLK_LEFT])   button_down(button_left     , msecs);
+        if ( key_state[SDLK_RIGHT])  button_down(button_right    , msecs);
+
+        // SDL_KEYUP   handling (that works)
+        if (!key_state[SDLK_ESCAPE]) button_up(  button_quit     , msecs);
+        if (!key_state[SDLK_SPACE])  button_up(  button_playpause, msecs);
+        if (!key_state[SDLK_RETURN]) button_up(  button_stopmenu , msecs);
+        if (!key_state[SDLK_LEFT])   button_up(  button_left     , msecs);
+        if (!key_state[SDLK_RIGHT])  button_up(  button_right    , msecs);
 
         // Output button down duration when released
         if (DEBUG_BUTTON) {

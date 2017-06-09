@@ -31,8 +31,6 @@ Several controller designs are available.
 
 == Bugs ==
 
-# SDL is returning key up/down events even when key is held down.
-** Regardless of SDL_EnableKeyRepeat(0, 0)
-** Won't actually matter when we are driven by external controls but still...
+-
 
 <<< vim:set ts=4 sw=4 tw=80 et cindent ai si syn=creole: >>>
