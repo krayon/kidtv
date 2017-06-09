@@ -280,6 +280,25 @@ int main(int argc, char *argv[]) {
             } // switch (event.type)
         } // while (SDL_PollEvent(&event))
 
+        // Output button down duration when released
+        if (DEBUG_BUTTON) {
+            for (t_button i = 0; i < button_COUNT; ++i) {
+                if (
+                       button[i].new_press
+                    && !button[i].down
+                    && button[i].last_up != 0
+                ) {
+                    dlog(LOG_BUTTON
+                        ,"!%s: %ld (last_down), %ld (last_up), %ld (a-b)\n"
+                        ,s_button[i]
+                        ,button[i].last_down
+                        ,button[i].last_up
+                        ,button[i].last_down - button[i].last_up
+                    );
+                }
+            }
+        }
+
         // Quit button has been released
         if (button[button_quit].new_press && !button[button_quit].down) {
             if (button[button_quit].last_up != 0) {
@@ -295,8 +314,9 @@ int main(int argc, char *argv[]) {
                 }
             }
 
+            // Button has been processed
             button[button_quit].new_press = false;
-        } // if (!button[button_quit].down)
+        } // if (button[button_quit].new_press && !button[button_quit].down)
     } // while (!quit)
 
     // NOTE: cleanup() is called here (via atexit())
