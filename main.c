@@ -317,6 +317,18 @@ int main(int argc, char *argv[]) {
             // Button has been processed
             button[button_quit].new_press = false;
         } // if (button[button_quit].new_press && !button[button_quit].down)
+
+        // Mark all new button presses as old
+        for (t_button i = 0; i < button_COUNT; ++i) {
+            if (
+                   button[i].new_press
+                && !button[i].down
+            ) {
+                // Button has been processed
+                button[i].new_press = false;
+            }
+        }
+
     } // while (!quit)
 
     // NOTE: cleanup() is called here (via atexit())
@@ -389,9 +401,11 @@ static void button_down(const t_button but, const unsigned long msecs) {
 }
 
 static void button_up(const t_button but, const unsigned long msecs) {
-    dlog(LOG_BUTTON, "UP:   %s\n", s_button[but]);
+    if (button[but].down) {
+        dlog(LOG_BUTTON, "UP:   %s\n", s_button[but]);
 
-    button[but].down      = false;
-    button[but].last_down = msecs;
+        button[but].down      = false;
+        button[but].last_down = msecs;
+    }
 }
 
