@@ -38,8 +38,8 @@
 #define WIN_WIDTH  800
 #define WIN_HEIGHT 600
 
-#define KEY_DELAY      (100)
-#define QUIT_KEY_DELAY (KEY_DELAY)
+#define BUTTON_DELAY      (100)
+#define QUIT_BUTTON_DELAY (BUTTON_DELAY)
 
 // All available buttons
 typedef enum e_button t_button;
@@ -290,7 +290,7 @@ int main(int argc, char *argv[]) {
                     ,button[button_quit].last_down - button[button_quit].last_up
                 );
 
-                if (button[button_quit].last_down - button[button_quit].last_up > QUIT_KEY_DELAY) {
+                if (button[button_quit].last_down - button[button_quit].last_up > QUIT_BUTTON_DELAY) {
                     quit = true;
                 }
             }

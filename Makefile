@@ -91,7 +91,7 @@ BINNAME        = $(shell sed -n 's/^[ \t]*\#define[ \t]*BIN_NAME[ \t]*"\([^"]*\)
 #         1.10.5                          == tag
 #               -3                        == 3 commits ahead of tag
 #                 -g6ab5527               == 'g'it commit starting with 6ab5527
-#                          -dirty         == some files are not in repo
+#                          -dirty         == some files here not in repository
 #                                -ft-cool == ft-cool branch
 APPBRANCH = $(shell bash -c \
 	'\
